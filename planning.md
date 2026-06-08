@@ -9,7 +9,7 @@
 
 ## Domain
 
-<!-- What domain did you choose? Why is this knowledge valuable and hard to find through official channels? -->
+I chose dining options at Washington University in St. Louis, because it is something that I personally would use as an incoming transfer student. I suspect the dining experience as a student at WashU will be much different than that of Oberlin, where the school and town are much smaller and thus the options are more limited. At WashU, there seem to a greater variety of dining options throughout campus as well as many restaurants in St. Louis, and I felt that it would be nice to have all of this information in one place instead of having to dig through multiple different sources about the "best dining halls" or "best restaurants" at/around WashU/St. Louis.
 
 ---
 
@@ -20,16 +20,16 @@
 
 | # | Source | Description | URL or location |
 |---|--------|-------------|-----------------|
-| 1 | | | |
-| 2 | | | |
-| 3 | | | |
-| 4 | | | |
-| 5 | | | |
-| 6 | | | |
-| 7 | | | |
-| 8 | | | |
-| 9 | | | |
-| 10 | | | |
+| 1 | WashU Dining Services | Useful for broad campus dining structure, locations, and official dining categories. | https://washudining.sodexomyway.com/en-us/
+| 2 | WashU Undergraduate Admissions | Useful for a student-facing overview of campus dining and notable locations. | https://admissions.washu.edu/life-at-washu/dining-services/ |
+| 3 | WashU Dining Services | Useful for detailed station-by-station listings, grab-and-go items, and hours-style information. | https://diningservices.wustl.edu/items/ |
+| 4 | Reddit | Useful for advice on meal plan options. | https://www.reddit.com/r/washu/comments/4a76i0/what_is_the_best_plan_for_meal_plan_and_bear_bucks/ |
+| 5 | WashU HR dining on campus page | Useful for institutional language about dining quality, dietary options, and campus food values | https://hr.wustl.edu/items/dining-on-campus/ |
+| 6 | WashU “Where to Eat” guide | Useful for a more descriptive campus dining guide with hours and specific venues. | https://mii.wustl.edu/2019-mii-conference/where-to-eat/ |
+| 7 | WashU Dis-Orientation Guide food page | Useful as an unofficial student-oriented source for food recommendations and local context. | https://sites.wustl.edu/diso2025-26/items/type/life-in-stl/food/ |
+| 8 | Reddit | Good for off-campus restaurant recommendations from students. | https://www.reddit.com/r/washu/comments/l90tqi/what_is_your_favorite_restaurant_near_campus/ |
+| 9 | Reddit |Good for broad student impressions of dining variety, hours, and on-campus options. |https://www.reddit.com/r/washu/comments/ok61h3/whats_the_food_situation_like_at_washu/ |
+| 10 | WashU campus restaurant list / local campus food guide | Useful as an informal campus-oriented article about local restaurants on or near campus. | https://aperiodictable.substack.com/p/back-to-school-with-washington-universitys |
 
 ---
 
@@ -41,11 +41,13 @@
      A review-heavy corpus warrants different chunking than a long FAQ. -->
 
 **Chunk size:**
+~600 char cap, ~200 char floor (merge small list items up to it)
 
 **Overlap:**
+100 chars, applied only when a unit exceeds the cap
 
 **Reasoning:**
-
+ review paragraphs run 400–600 chars and are self-contained, so the cap keeps each review intact; lists have tiny items, so the floor merges them into coherent chunks instead of noisy fragments.
 ---
 
 ## Retrieval Approach
@@ -57,11 +59,13 @@
      support, accuracy on domain-specific text, latency? -->
 
 **Embedding model:**
+all-MiniLM-L6-v2
 
 **Top-k:**
+k = 4
 
 **Production tradeoff reflection:**
-
+Since the domain does not require a great depth of knowledge but is rather factual and opinion based, I would not need to consider too much on accuracy. I think using smaller local models like qwen3.5:4b or so would still be feasibile since those models can handel generic tasks pretty well, and since this domain does not require too much reasoning, we don't have to use super advanced API models like GPT 5.5.
 ---
 
 ## Evaluation Plan
@@ -73,11 +77,11 @@
 
 | # | Question | Expected answer |
 |---|----------|-----------------|
-| 1 | | |
-| 2 | | |
-| 3 | | |
-| 4 | | |
-| 5 | | |
+| 1 | What are the main on-campus dining locations at WashU, and how are they categorized? | Should list the official dining venues/categories (e.g. dining halls, cafés, grab-and-go). *Verify exact names against Source #1 / #2.* |
+| 2 | What grab-and-go or station options are available, and what kind of items do they serve? | Should name specific stations and item types from the station-by-station listing. *Verify against Source #3.* |
+| 3 | What off-campus restaurants near WashU do students personally recommend, and why? | Should surface specific restaurants with student opinions/reasons (cuisine, value, vibe). *Verify against Reddit thread #8 / Substack #10.* |
+| 4 | What types of cuisine and price ranges are available at restaurants near campus? | Should list cuisine categories and relative price levels for nearby venues. *Verify against OpenTable #9.* |
+| 5 | How does WashU describe its dietary accommodations and food quality values? | Should reflect institutional language on dietary options (e.g. allergen/vegetarian) and food values. *Verify against #5 / #4.* |
 
 ---
 
@@ -87,9 +91,9 @@
      Consider: noisy or inconsistent documents, missing source attribution, off-topic
      retrieval, chunks that split key information across boundaries. -->
 
-1.
+1. The llm goes beyond the distance range when searching for off campus restauarants
 
-2.
+2. Not enough opinionated sources causes llm to hallucinate about restaurant recommendations or doesn't provide enough variety
 
 ---
 
@@ -100,6 +104,8 @@
      Label each stage with the tool or library you're using.
      You can use ASCII art, a Mermaid diagram, or embed a sketch as an image.
      You'll use this diagram as context when prompting AI tools to implement each stage. -->
+
+loading chunks from ingestion pipeline, embedding with all-MiniLM-L6-v2, storing in ChromaDB with source metadata
 
 ---
 
@@ -114,6 +120,13 @@
      "I'll use AI to help me code" is not a plan.
      "I'll give Claude my Chunking Strategy section and ask it to implement chunk_text()
      with my specified chunk size and overlap" is a plan. -->
+
+I will use Claude for my chunking strategy section and ask it to implement chunk_text()
+
+I will use Claude for similarity search and sort query results from lowest to highest similarity scores
+
+
+
 
 **Milestone 3 — Ingestion and chunking:**
 
